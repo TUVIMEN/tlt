@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # by TUVIMEN <suchora.dominik7@gmail.com>
 # License: GNU GPLv3
 
@@ -8,10 +8,9 @@ by_size="size"
 by_se="seeds"
 by_le="leechs"
 
-SORT=$by_name
+SORT="$by_name"
 PAGE=1
 SEARCH=""
-NAME=$(basename "$0")
 
 while [ $# -gt 0 ]
 do
@@ -27,17 +26,17 @@ do
       shift 2
       ;;
     -h|--help)
-        echo -e "$NAME [OPTION]... [PATTERN]\nSearch for PATTERN in pb.\nExample: $NAME -s size -p 2 'archlinux'\n"
-        echo -e "Options:\n  -s,  --sort TYPE\tsort using TYPE that can be: name, size, time, se, le"
-        echo -e "  -p,  --page NUM\tshow page at NUM"
-        echo -e "  -h,  --help\t\tshow help"
-        echo -e "\nMagnet link will be copied via xclip."
+        NAME="$(basename "$0")"
+        printf "%s [OPTION]... [PATTERN]\nSearch for PATTERN in pb.\nExample: %s -s size -p 2 'archlinux'\n\n" "$NAME" "$NAME"
+        printf "Options:\n  -s,  --sort TYPE\tsort using TYPE that can be: name, size, time, se, le\n"
+        printf "  -p,  --page NUM\tshow page at NUM\n"
+        printf "  -h,  --help\t\tshow help\n"
+        printf "\nMagnet link will be copied via xclip.\n"
         exit 0
         ;;
     -p|--page)
         PAGE="$2"
-        shift
-        shift
+        shift 2
         ;;
     *)
       SEARCH="$1"
@@ -46,7 +45,7 @@ do
   esac
 done
 
-SEARCHP=$(tr ' .+/_:;' '-' <<< "$SEARCH")
+SEARCHP=$(echo "$SEARCH" | tr ' .+/_:;' '-')
 
 t1=$(mktemp)
 t_time=$(mktemp)
@@ -59,27 +58,16 @@ t_link=$(mktemp)
 trap 'rm "$t1" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health" "$t_name" "$t_link"' EXIT
 
 curl -s "https://www.limetorrents.pro/search/all/$SEARCHP/$SORT/$PAGE/" | hgrep 'table +class="table2"; tr +bgcolor; td' > "$t1"
-
 hgrep 'td +class="tdnormal"' "$t1" | grep '</a></td>$' | sed 's/^.*">//; s/<.*//; s/ - .*//' > "$t_time"
-
 hgrep 'td +class="tdnormal"' "$t1" | grep -v '</a></td>$' | sed '/^\t/d; s/^.*">//; s/<.*//' > "$t_size"
-
 hgrep 'td +class="tdseed"' "$t1" | sed 's/^.*">//; s/<.*//' > "$t_se"
-
 hgrep 'td +class="tdleech"' "$t1" | sed 's/^.*">//; s/<.*//' > "$t_le"
-
 hgrep 'td +class="tdright"' "$t1" | sed 's/^.*"hb//; s/".*//' > "$t_health"
-
 hgrep 'td +class="tdleft; a +href=".*\.html""' "$t1" | sed 's/^.*">//; s/<.*//' > "$t_name"
-
 hgrep 'td +class="tdleft; a +href=".*\.html""' "$t1" | sed 's/<a href="/https:\/\/www\.limetorrents\.pro\//; s/".*//' > "$t_link"
 
 
-nl <(paste "$t_name" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health")
-echo -n 'num> '
+paste "$t_name" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health" | nl
+printf 'num> '
 read -r NUMBER
-
-if [ "$NUMBER" -gt 0 ]
-then
-    curl -g -s $(sed "${NUMBER}q;d" "$t_link") | hgrep 'div +class="dltorrent"; p; a +href="magnet:\?xt.*"' | sed 's/^.*="//; s/".*//' | tee /dev/stderr | xclip -sel clip
-fi
+[ "$NUMBER" -gt 0 ] && curl -g -s "$(sed "${NUMBER}q;d" "$t_link")" | hgrep 'div +class="dltorrent"; p; a +href="magnet:\?xt.*"' | sed 's/^.*="//; s/".*//' | tee /dev/stderr | xclip -sel clip
