@@ -70,4 +70,4 @@ hgrep 'td +class="tdleft; a +href=".*\.html""' "$t1" | sed 's/<a href="/https:\/
 paste "$t_name" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health" | nl
 printf 'num> '
 read -r NUMBER
-[ "$NUMBER" -gt 0 ] && curl -g -s "$(sed "${NUMBER}q;d" "$t_link")" | hgrep 'div +class="dltorrent"; p; a +href="magnet:\?xt.*"' | sed 's/^.*="//; s/".*//' | tee /dev/stderr | xclip -sel clip
+[ "$NUMBER" -gt 0 ] && curl -g -s "$(sed "${NUMBER}q;d" "$t_link")" | grep -oE -m 1 'magnet:\?[^"]+' | tee /dev/stderr | xclip -sel clip
