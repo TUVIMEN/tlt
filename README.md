@@ -1,5 +1,5 @@
-# tpb
-A bash script to search for torrents on limetorrents.
+# tlt
+A shell script to search for torrents on limetorrents.
 
 ## Requirements
 
