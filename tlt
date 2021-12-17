@@ -11,6 +11,7 @@ by_le="leechs"
 SORT="$by_name"
 PAGE=1
 SEARCH=""
+DOMAIN="https://www.limetorrents.pro"
 
 while [ $# -gt 0 ]
 do
@@ -29,10 +30,15 @@ do
         NAME="$(basename "$0")"
         printf "%s [OPTION]... [PATTERN]\nSearch for PATTERN in pb.\nExample: %s -s size -p 2 'archlinux'\n\n" "$NAME" "$NAME"
         printf "Options:\n  -s,  --sort TYPE\tsort using TYPE that can be: name, size, time, se, le\n"
+        printf "  -d,  --domain DOMAIN\tset domain to DOMAIN\n"
         printf "  -p,  --page NUM\tshow page at NUM\n"
         printf "  -h,  --help\t\tshow help\n"
         printf "\nMagnet link will be copied via xclip.\n"
         exit 0
+        ;;
+    -d|--domain)
+        DOMAIN="$2"
+        shift 2
         ;;
     -p|--page)
         PAGE="$2"
@@ -58,7 +64,7 @@ t_name=$(mktemp)
 t_link=$(mktemp)
 trap 'rm "$t1" "$t2" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health" "$t_name" "$t_link"' EXIT
 
-curl -s "https://www.limetorrents.pro/search/all/$SEARCHP/$SORT/$PAGE/" | hgrep 'table +class="table2"; td' > "$t1"
+curl -s "$DOMAIN/search/all/$SEARCHP/$SORT/$PAGE/" | hgrep 'table +class="table2"; td' > "$t1"
 hgrep 'td +class="tdnormal"' "$t1" -printf '%i\n' > "$t2"
 grep -v ' - ' "$t2" > "$t_size"
 sed '/ - /!d; s/ - .*//' "$t2" > "$t_time"
@@ -66,7 +72,7 @@ hgrep 'td +class="tdseed"' "$t1" -printf "%i\n" > "$t_se"
 hgrep 'td +class="tdleech"' "$t1" -printf "%i\n" > "$t_le"
 hgrep 'td +class="tdright"; div' "$t1" -printf "%(class)a\n" > "$t_health"
 hgrep 'td +class="tdleft"; a +href=".*\.html"' "$t1" -printf "%i\n" > "$t_name"
-hgrep 'td +class="tdleft"; a +href=".*\.html"' "$t1" -printf "https://www.limetorrents.pro/%(href)a\n" > "$t_link"
+hgrep 'td +class="tdleft"; a +href=".*\.html"' "$t1" -printf "$DOMAIN/%(href)a\n" > "$t_link"
 
 paste "$t_name" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health" | nl
 printf 'num> '
