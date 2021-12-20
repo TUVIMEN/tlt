@@ -1,5 +1,5 @@
 # tlt
-A shell script to search for torrents on limetorrents.
+A shell script for searching torrents on limetorrents.
 
 ## Requirements
 

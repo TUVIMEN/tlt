@@ -28,7 +28,7 @@ do
       ;;
     -h|--help)
         NAME="$(basename "$0")"
-        printf "%s [OPTION]... [PATTERN]\nSearch for PATTERN in pb.\nExample: %s -s size -p 2 'archlinux'\n\n" "$NAME" "$NAME"
+        printf "%s [OPTION]... [PATTERN]\nSearch for PATTERN in lt.\nExample: %s -s size -p 2 'archlinux'\n\n" "$NAME" "$NAME"
         printf "Options:\n  -s,  --sort TYPE\tsort using TYPE that can be: name, size, time, se, le\n"
         printf "  -d,  --domain DOMAIN\tset domain to DOMAIN\n"
         printf "  -p,  --page NUM\tshow page at NUM\n"
