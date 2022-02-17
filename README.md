@@ -7,6 +7,4 @@ A shell script for searching torrents on limetorrents.
  - xclip
 
 ## Instalation
-    git clone 'https://github.com/TUVIMEN/tlt'
-    cd tlt
-    sudo install -m 755 tlt /usr/bin
+    install -m 755 tlt /usr/bin
