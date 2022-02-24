@@ -12,6 +12,15 @@ SORT="$by_name"
 PAGE=1
 SEARCH=""
 DOMAIN="https://www.limetorrents.pro"
+DELIM="\t"
+
+C_LE="31"
+C_SE="32"
+C_SIZE="33"
+C_HEALTH="35"
+C_TIME="36"
+C_NAME="39"
+COLOR=1
 
 while [ $# -gt 0 ]
 do
@@ -24,30 +33,37 @@ do
         se) SORT=$by_se;;
         le) SORT=$by_le;;
       esac
-      shift 2
-      ;;
+      shift 2;;
     -h|--help)
         NAME="$(basename "$0")"
         printf "%s [OPTION]... [PATTERN]\nSearch for PATTERN in lt.\nExample: %s -s size -p 2 'archlinux'\n\n" "$NAME" "$NAME"
-        printf "Options:\n  -s,  --sort TYPE\tsort using TYPE that can be: name, size, time, se, le\n"
-        printf "  -d,  --domain DOMAIN\tset domain to DOMAIN\n"
-        printf "  -p,  --page NUM\tshow page at NUM\n"
-        printf "  -h,  --help\t\tshow help\n"
+        printf "Options:\n  -s,  --sort TYPE\t\tsort using TYPE that can be: name, size, time, se, le\n"
+        printf "  -d,  --domain DOMAIN\t\tset domain to DOMAIN\n"
+        printf "  -D,  --delimiter DELIM\tset delimiter to DELIM\n"
+        printf "  -p,  --page NUM\t\tshow page at NUM\n"
+        printf "  -c,  --color\t\t\tcolor output\n"
+        printf "  -C,  --no-color\t\tdisable coloring of output\n"
+        printf "  -h,  --help\t\t\tshow help\n"
         printf "\nMagnet link will be copied via xclip.\n"
-        exit 0
-        ;;
+        exit 0;;
+    -c|--color)
+        COLOR=1
+        shift;;
+    -C|--no-color)
+        COLOR=0
+        shift;;
     -d|--domain)
         DOMAIN="$2"
-        shift 2
-        ;;
+        shift 2;;
     -p|--page)
         PAGE="$2"
-        shift 2
-        ;;
+        shift 2;;
+    -D|--delimiter)
+        DELIM="$2"
+        shift 2;;
     *)
       SEARCH="$1"
-      shift
-      ;;
+      shift;;
   esac
 done
 
@@ -74,7 +90,23 @@ hgrep 'td +class="tdright"; div' "$t1" -printf "%(class)a\n" > "$t_health"
 hgrep 'td +class="tdleft"; a +href=".*\.html"' "$t1" -printf "%i\n" > "$t_name"
 hgrep 'td +class="tdleft"; a +href=".*\.html"' "$t1" -printf "$DOMAIN/%(href)a\n" > "$t_link"
 
-paste "$t_name" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health" | nl
+
+color_lines() {
+    sed "s/^/\x1b[$1m/; s/$/\x1b[0m/" "$2" > "$3"
+    cp "$3" "$2"
+}
+
+if [ "$COLOR" -eq 1 ]
+then
+    color_lines "$C_SIZE" "$t_size" "$t1"
+    color_lines "$C_NAME" "$t_name" "$t1"
+    color_lines "$C_LE" "$t_le" "$t1"
+    color_lines "$C_SE" "$t_se" "$t1"
+    color_lines "$C_TIME" "$t_time" "$t1"
+    color_lines "$C_HEALTH" "$t_health" "$t1"
+fi
+
+paste -d "$DELIM" "$t_name" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health" | nl
 printf 'num> '
 read -r NUMBER
 [ "$NUMBER" -gt 0 ] && curl -g -s "$(sed "s/ /%20/g; ${NUMBER}q;d" "$t_link")" | grep -oE -m 1 'magnet:\?[^"]+' | tee /dev/stderr | xclip -sel clip
