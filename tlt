@@ -81,14 +81,14 @@ t_link=$(mktemp)
 trap 'rm "$t1" "$t2" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health" "$t_name" "$t_link"' EXIT
 
 curl -s "$DOMAIN/search/all/$SEARCHP/$SORT/$PAGE/" | hgrep 'table +class="table2"; td' > "$t1"
-hgrep 'td +class="tdnormal"' "$t1" -printf '%i\n' > "$t2"
+hgrep 'td +class="tdnormal" @p"%i\n"' "$t1" > "$t2"
 grep -v ' - ' "$t2" > "$t_size"
 sed '/ - /!d; s/ - .*//' "$t2" > "$t_time"
-hgrep 'td +class="tdseed"' "$t1" -printf "%i\n" > "$t_se"
-hgrep 'td +class="tdleech"' "$t1" -printf "%i\n" > "$t_le"
-hgrep 'td +class="tdright"; div' "$t1" -printf "%(class)a\n" > "$t_health"
-hgrep 'td +class="tdleft"; a +href=".*\.html"' "$t1" -printf "%i\n" > "$t_name"
-hgrep 'td +class="tdleft"; a +href=".*\.html"' "$t1" -printf "$DOMAIN/%(href)a\n" > "$t_link"
+hgrep 'td +class="tdseed" @p"%i\n"' "$t1" > "$t_se"
+hgrep 'td +class="tdleech" @p"%i\n"' "$t1" > "$t_le"
+hgrep 'td +class="tdright"; div @p"%(class)a\n"' "$t1" > "$t_health"
+hgrep 'td +class="tdleft"; a +href=".*\.html" @p"%i\n"' "$t1" > "$t_name"
+hgrep 'td +class="tdleft"; a +href=".*\.html" @p"'$DOMAIN'/%(href)a\n"' "$t1" > "$t_link"
 
 
 color_lines() {
