@@ -80,7 +80,7 @@ t_name=$(mktemp)
 t_link=$(mktemp)
 trap 'rm "$t1" "$t2" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health" "$t_name" "$t_link"' EXIT
 
-curl -s "$DOMAIN/search/all/$SEARCHP/$SORT/$PAGE/" | hgrep 'table +class="table2"; td' > "$t1"
+curl -g -L -s "$DOMAIN/search/all/$SEARCHP/$SORT/$PAGE/" | hgrep 'table +class="table2"; td' > "$t1"
 hgrep 'td +class="tdnormal" @p"%i\n"' "$t1" > "$t2"
 grep -v ' - ' "$t2" > "$t_size"
 sed '/ - /!d; s/ - .*//' "$t2" > "$t_time"
@@ -109,4 +109,4 @@ fi
 paste -d "$DELIM" "$t_name" "$t_time" "$t_size" "$t_se" "$t_le" "$t_health" | nl
 printf 'num> '
 read -r NUMBER
-[ "$NUMBER" -gt 0 ] && curl -g -s "$(sed "s/ /%20/g; ${NUMBER}q;d" "$t_link")" | grep -oE -m 1 'magnet:\?[^"]+' | tee /dev/stderr | xclip -sel clip
+[ "$NUMBER" -gt 0 ] && curl -L -g -s "$(sed "s/ /%20/g; ${NUMBER}q;d" "$t_link")" | grep -oE -m 1 'magnet:\?[^"]+' | tee /dev/stderr | xclip -sel clip
