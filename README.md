@@ -6,5 +6,5 @@ A shell script for searching torrents on limetorrents.
  - [hgrep](https://github.com/TUVIMEN/hgrep)
  - xclip
 
-## Instalation
+## Installation
     install -m 755 tlt /usr/bin
