@@ -25,7 +25,7 @@ Search for the most seeded linux isos on second page
 
 Search different domain for linux isos and change delimiter to space
 
-    tlt -d ' ' -D 'http://otherdomain.to' 'linux iso'
+    tlt -D ' ' -d 'http://otherdomain.to' 'linux iso'
 
 Get some help
 
