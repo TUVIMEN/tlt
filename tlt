@@ -11,7 +11,7 @@ by_le="leechs"
 SORT="$by_name"
 PAGE=1
 SEARCH=""
-DOMAIN="https://www.limetorrents.pro"
+DOMAIN="https://www.limetorrents.lol/"
 DELIM="\t"
 
 C_LE="31"
