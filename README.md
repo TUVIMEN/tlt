@@ -13,15 +13,15 @@ A shell script for searching torrents on limetorrents.
 
 ## Usage
 
-Just type 'tlt "your search"', choose what you want and the magnet link will be copied to your clipboard.
+Just type 'tlt your search', choose what you want and the magnet link will be copied to your clipboard.
 
 Search for the biggest linux isos
 
-    tlt -s size 'linux iso'
+    tlt -s size linux iso
 
 Search for the most seeded linux isos on second page
 
-    tlt -s se -p 2 'linux iso'
+    tlt -s se -p 2 linux iso
 
 Search different domain for linux isos and change delimiter to space
 
